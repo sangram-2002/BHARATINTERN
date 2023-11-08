@@ -1,0 +1,39 @@
+// Variables
+let localVideo;
+let localStream;
+let remoteVideo;
+let peer;
+
+// Function to set up local video stream
+async function setupLocalVideo() {
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localVideo.srcObject = localStream;
+    } catch (error) {
+        console.error('Error accessing local video stream:', error);
+    }
+}
+
+// Function to initiate the call
+function startCall() {
+    if (!peer) {
+        peer = new SimplePeer({ initiator: true, stream: localStream });
+
+        peer.on('signal', data => {
+            // Copy the signal data and share it with the other user (e.g., via chat or other means)
+            console.log('Send this signal to the other user:', data);
+        });
+
+        peer.on('stream', remoteStream => {
+            remoteVideo.srcObject = remoteStream;
+        });
+    }
+}
+
+// Event listener for "Start Call" button
+document.getElementById('start-call-btn').addEventListener('click', startCall);
+
+// Initialize the local video stream
+localVideo = document.getElementById('local-video');
+remoteVideo = document.getElementById('remote-video');
+setupLocalVideo();
